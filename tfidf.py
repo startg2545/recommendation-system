@@ -18,8 +18,11 @@ import pickle
 
 # In[2]:
 
+# Get filename from pickle
+with open('./pickle/filename.pickle', 'rb') as f:
+    filename = pickle.load(f)
 
-file_name = 'dataset.xlsx'
+file_name = './uploads/' + filename
 file = pd.read_excel(file_name)
 
 

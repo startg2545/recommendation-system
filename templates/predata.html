@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Simple HTML Page</title>
+</head>
+<body>
+
+<h2>Get recommendations</h2>
+<p>Filename: {{ filename }}</p>
+
+<form method="POST" enctype="multipart/form-data" action="/get-recommendation">
+    <h3>TF-IDF recommender</h3>
+    <p>Search a user:<input type="text" id="user" name="user"></p>
+    <input type="submit" name="tfidf" value="submit form tfidf">
+</form>
+
+<form method="POST" enctype="multipart/form-data" action="/get-recommendation">
+    <h3>KNN recommender</h3>
+    <p>Search a user:<input type="text" id="user" name="user"></p>
+    <input type="submit" name="knn" value="submit form knn">
+</form>
+<form method="POST" enctype="multipart/form-data" action="/get-recommendation">
+    <h3>Hybrid recommender</h3>
+    <p>Search a user:<input type="text" id="user" name="user"></p>
+    <input type="submit" name="hybrid" value="submit form hybrid">
+</form>
+
+<script>
+function getRecommendations(user) {
+    return ['a', 'b', 'c'];
+}
+</script>
+
+</body>
+</html>
