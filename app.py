@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, redirect, session, url_for, render_template
-import subprocess
 import pickle
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = 'iqcejokmkbogg'  # replace with your secret key
@@ -36,13 +36,17 @@ def get_recommendation():
     if 'tfidf' in request.form:
         model = 'tfidf'
         user = request.form.get('user')
+        result = subprocess.run(['python', 'tfidf.py', user], capture_output=True, text=True)
+        dataframe = result.stdout
     elif 'knn' in request.form:
         model = 'knn'
         user = request.form.get('user')
+        result = subprocess.run(['python', 'knn.py', user], capture_output=True, text=True)
+        dataframe = result.stdout
     elif 'hybrid' in request.form:
         model = 'hybrid'
         user = request.form.get('user')
-    return render_template('recommendation.html', user=user, model=model)
+    return render_template('recommendation.html', user=user, model=model, dataframe=dataframe)
 
 if __name__ == '__main__':
     app.debug = True

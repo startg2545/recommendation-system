@@ -12,11 +12,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 import translators as ts
 import pickle
+import sys
 
 
 # Read the file
 
 # In[2]:
+
+# Receive the user name from app.py
+user_input = sys.argv[1]
 
 # Get filename from pickle
 with open('./pickle/filename.pickle', 'rb') as f:
@@ -29,7 +33,6 @@ file = pd.read_excel(file_name)
 # Language convert function
 
 # In[3]:
-
 
 def translate_eng(text):
     return ts.translate_text(text)
@@ -89,6 +92,11 @@ number_of_courses = len(courses)
 vectorizer = TfidfVectorizer(stop_words='english')
 tfidf_matrix = vectorizer.fit_transform(courses_clean)
 
+# dense_tfidf_matrix = tfidf_matrix.toarray()
+# print(dense_tfidf_matrix)
+
+# feature_names = vectorizer.get_feature_names_out()
+# print(feature_names)
 
 # Create path
 
@@ -120,7 +128,7 @@ with open(file_path, 'wb') as f:
 
 
 cosine_similarities = linear_kernel(tfidf_matrix)
-
+print(cosine_similarities)
 
 # Create recommendation system function
 
@@ -181,9 +189,6 @@ def recommender_tfidf(course_name):
 # Test recommendation system using TF-IDF
 
 # In[12]:
-
-
-recommender_tfidf('Cancer Epidemiology and Prevention')
 
 
 # Predata for hybrid recommendation
@@ -250,7 +255,10 @@ def recommender_tfidf_all_courses(course_name):
 # In[14]:
 
 
-def recommender_tfidf_by_user(user_name, n_recommendations):
+def recommender_tfidf_by_user(user_name):
+    
+    n_recommendations = 5
+    
     df = {
         'User': pd.Series(file['username']),
         'Course': pd.Series(file['course'])
@@ -276,9 +284,7 @@ def recommender_tfidf_by_user(user_name, n_recommendations):
 
 # In[15]:
 
-
-recommender_tfidf_by_user('PORPHAING JANTIP', 10)
-
+print(recommender_tfidf_by_user(user_input).to_html(index=False))
 
 # References
 

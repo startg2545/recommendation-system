@@ -12,12 +12,19 @@ import pickle
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
 from fuzzywuzzy import process
+import sys
 
 
 # In[2]:
 
+# Receive the user name from app.py
+user_input = sys.argv[1]
 
-file_name = 'dataset.xlsx'
+# Get filename from pickle
+with open('./pickle/filename.pickle', 'rb') as f:
+    filename = pickle.load(f)
+
+file_name = './uploads/' + filename
 file = pd.read_excel(file_name)
 
 
@@ -94,9 +101,9 @@ zero_score_count = email_score.where(email_score == 0).count()
 one_score_count = email_score.where(email_score == 1).count()
 two_score_count = email_score.where(email_score == 2).count()
 
-print("Number of students who filled cmu email:", two_score_count)
-print("Number of students who filled other email:", one_score_count)
-print("Number of students who did not fill email:", zero_score_count)
+# print("Number of students who filled cmu email:", two_score_count)
+# print("Number of students who filled other email:", one_score_count)
+# print("Number of students who did not fill email:", zero_score_count)
 
 
 # Create function to calculate age-education score
@@ -168,9 +175,9 @@ zero_score_count = age_education_scores.where(age_education_scores == 0).count()
 one_score_count = age_education_scores.where(age_education_scores == 1).count()
 two_score_count = age_education_scores.where(age_education_scores == 2).count()
 
-print("Number of students who are currently in the educational system:", zero_score_count)
-print("Number of students who were recently graduated:", one_score_count)
-print("Number of students who are not in the educational system:", two_score_count)
+# print("Number of students who are currently in the educational system:", zero_score_count)
+# print("Number of students who were recently graduated:", one_score_count)
+# print("Number of students who are not in the educational system:", two_score_count)
 
 
 # Create Series of status
@@ -208,9 +215,9 @@ zero_score_count = payment_score.where(payment_score == 0).count()
 one_score_count = payment_score.where(payment_score == 1).count()
 two_score_count = payment_score.where(payment_score == 2).count()
 
-print("Number of students who are in arrears:", zero_score_count)
-print("Number of students whose payment was not approved:", one_score_count)
-print("Number of students with payment approval:", two_score_count)
+# print("Number of students who are in arrears:", zero_score_count)
+# print("Number of students whose payment was not approved:", one_score_count)
+# print("Number of students with payment approval:", two_score_count)
 
 
 # Create Series of address
@@ -240,8 +247,8 @@ address_score = pd.Series(address_score)
 zero_score_count = address_score.where(address_score == 0).count()
 one_score_count = address_score.where(address_score == 1).count()
 
-print("Number of students who did not fill address:", zero_score_count)
-print("Number of students who filled address:", one_score_count)
+# print("Number of students who did not fill address:", zero_score_count)
+# print("Number of students who filled address:", one_score_count)
 
 
 # Create Series of data
@@ -249,10 +256,12 @@ print("Number of students who filled address:", one_score_count)
 # In[19]:
 
 
-time = file.loc[:, 'time'].fillna("")
-time = pd.Series(time ,name='Time')
-time = time.str.slice(start=-8, stop=-6)
-
+date = file.loc[:, 'date'].fillna("")
+date = pd.Series(date ,name='Date')
+colon_index = date.str.rfind(':')
+start_letter = (colon_index - 2).tolist()
+stop_letter = colon_index.tolist()
+hour = [s[start:stop] for s, start, stop in zip(date, start_letter, stop_letter)]
 
 # Provide a score to each user based on their enrollment time
 
@@ -260,7 +269,7 @@ time = time.str.slice(start=-8, stop=-6)
 
 
 time_set = {'08','09','10','15'}  # if the time is in this set, it is considered as a good time
-time_score = [ 1 if x in time_set else 0 for x in time]
+time_score = [ 1 if x in time_set else 0 for x in hour]
 time_score = pd.Series(time_score)
 
 
@@ -353,9 +362,25 @@ def recommender_knn(course_name):
 
 # In[27]:
 
+def recommender_knn_by_user(username):
+    # Filter the courses that the user has already taken
+    user_courses = file.loc[file['username'] == username]['course']
+    
+    # Get the recommendations based on these courses
+    recommendations = [recommender_knn(course) for course in user_courses]
 
-recommender_knn('หลักการและพื้นฐานของเครื่องมือทางรังสีวิทยา (Basic Principle of Diagnostic Radiology Imaging Instruments)')
+    # Reset index
+    recommendations = pd.concat(recommendations).drop_duplicates(subset='Course', keep='first')
 
+    # Drop duplicated courses
+    recommendations = recommendations.reset_index(drop=True)
+
+    # Add the new column called 'Score'
+    recommendations['Score'] = recommendations['Cosine Distance'].apply(lambda x: 1 - x)
+
+    return recommendations
+
+print(recommender_knn_by_user(user_input).to_html(index=False))
 
 # Predata of training
 
