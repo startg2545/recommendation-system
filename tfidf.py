@@ -27,6 +27,7 @@ with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
 file_name = './uploads/' + filename
+# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 

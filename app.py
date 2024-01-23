@@ -46,6 +46,8 @@ def get_recommendation():
     elif 'hybrid' in request.form:
         model = 'hybrid'
         user = request.form.get('user')
+        result = subprocess.run(['python', 'hybrid.py', user], capture_output=True, text=True)
+        dataframe = result.stdout
     return render_template('recommendation.html', user=user, model=model, dataframe=dataframe)
 
 if __name__ == '__main__':

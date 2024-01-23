@@ -11,14 +11,22 @@ from sklearn.neighbors import NearestNeighbors
 from fuzzywuzzy import process
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
+import sys
 
 
 # Check the validation of dataset format
 
 # In[2]:
 
+# Receive the user name from app.py
+user_input = sys.argv[1]
 
-file_name = 'dataset.xlsx'
+# Get filename from pickle
+with open('./pickle/filename.pickle', 'rb') as f:
+    filename = pickle.load(f)
+
+file_name = './uploads/' + filename
+# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 
@@ -83,82 +91,75 @@ is then fit on this combined matrix.'''
 # In[7]:
 
 
-def recommender_hybrid(course_name):
-    n_recommendations = int( number_of_courses ** (1/2) )
-    idx = process.extractOne(course_name, courses)[2]
-    distances, indices = model_combined.kneighbors(combined_matrix[idx], n_neighbors=n_recommendations+1, return_distance=True)
-    recommendations = [courses[i].where(i!=idx) for i in indices]
-    recommended_courses = recommendations[0][1:]
-    course_distances = distances[0][1:]
-    d = {
-        'Course': recommended_courses,
-        'Cosine Distance': course_distances
-    }
-    results = pd.DataFrame(data=d)
-    n_distance = results['Cosine Distance'].where(results['Cosine Distance'] < 0.8).count()
-    return results.head(n_distance)
+# def recommender_hybrid(course_name):
+#     n_recommendations = int( number_of_courses ** (1/2) )
+#     idx = process.extractOne(course_name, courses)[2]
+#     distances, indices = model_combined.kneighbors(combined_matrix[idx], n_neighbors=n_recommendations+1, return_distance=True)
+#     recommendations = [courses[i].where(i!=idx) for i in indices]
+#     recommended_courses = recommendations[0][1:]
+#     course_distances = distances[0][1:]
+#     d = {
+#         'Course': recommended_courses,
+#         'Cosine Distance': course_distances
+#     }
+#     results = pd.DataFrame(data=d)
+#     n_distance = results['Cosine Distance'].where(results['Cosine Distance'] < 0.8).count()
+#     return results.head(n_distance)
 
+# KNN Recommender function for all courses
 
 # In[8]:
 
 
-recommender_hybrid('หลักการและพื้นฐานของเครื่องมือทางรังสีวิทยา (Basic Principle of Diagnostic Radiology Imaging Instruments)')
-
-
-# KNN Recommender function for all courses
-
-# In[9]:
-
-
-def recommender_knn_all_courses(course_name):
-    idx = process.extractOne(course_name, courses)[2]
-    # print('Selected movie:', courses[idx], 'Index:', idx)
-    distances, indices = model_combined.kneighbors(knn_matrix[idx], n_neighbors=len(courses))
-    recommendations = [courses[i].where(i!=idx) for i in indices]
-    recommended_courses = recommendations[0][1:]
-    scores = 1 - distances
-    course_distances = scores[0][1:]
-    d = {
-        'Course': recommended_courses,
-        'Score': course_distances
-    }
-    results = pd.DataFrame(data=d)
-    results = results.sort_index().rename_axis('Index')
-    return results
+# def recommender_knn_all_courses(course_name):
+#     idx = process.extractOne(course_name, courses)[2]
+#     # print('Selected movie:', courses[idx], 'Index:', idx)
+#     distances, indices = model_combined.kneighbors(knn_matrix[idx], n_neighbors=len(courses))
+#     recommendations = [courses[i].where(i!=idx) for i in indices]
+#     recommended_courses = recommendations[0][1:]
+#     scores = 1 - distances
+#     course_distances = scores[0][1:]
+#     d = {
+#         'Course': recommended_courses,
+#         'Score': course_distances
+#     }
+#     results = pd.DataFrame(data=d)
+#     results = results.sort_index().rename_axis('Index')
+#     return results
 
 
 # KNN Recommender function using username
 
-# In[10]:
+# In[9]:
 
 
-def recommender_knn_by_user(user_name, n_recommendations):
-    df = {
-        'User': pd.Series(file['username']),
-        'Course': pd.Series(file['course'])
-    }
+# def recommender_knn_by_user(user_name, n_recommendations):
+#     df = {
+#         'User': pd.Series(file['username']),
+#         'Course': pd.Series(file['course'])
+#     }
     
-    user_course = pd.DataFrame(df)
-    selected_user_name = user_course.loc[user_course['User'] == user_name]
-    selected_courses = selected_user_name['Course']
+#     user_course = pd.DataFrame(df)
+#     selected_user_name = user_course.loc[user_course['User'] == user_name]
+#     selected_courses = selected_user_name['Course']
     
-    recommended_courses = [ recommender_knn_all_courses(x) for x in selected_courses]
+#     recommended_courses = [ recommender_knn_all_courses(x) for x in selected_courses]
     
-    # pre dataframe
-    df = pd.DataFrame({
-        'Course': [],
-        'Score': []
-    }).rename_axis('Index')
+#     # pre dataframe
+#     df = pd.DataFrame({
+#         'Course': [],
+#         'Score': []
+#     }).rename_axis('Index')
     
-    for x in recommended_courses:
-        df = df._append(x)
-    df =  df.sort_values('Score', ascending=False).drop_duplicates('Course')
-    return df.head(n_recommendations)
+#     for x in recommended_courses:
+#         df = df._append(x)
+#     df =  df.sort_values('Score', ascending=False).drop_duplicates('Course')
+#     return df.head(n_recommendations)
 
 
 # Hybrid Recommender function for all courses
 
-# In[11]:
+# In[10]:
 
 
 def recommender_hybrid_all_courses(course_name):
@@ -180,10 +181,13 @@ def recommender_hybrid_all_courses(course_name):
 
 # Hybrid Recommender function using username
 
-# In[12]:
+# In[11]:
 
 
-def recommender_hybrid_by_user(user_name, n_recommendations):
+def recommender_hybrid_by_user(user_name):
+
+    n_recommendations = number_of_courses - 1
+
     df = {
         'User': pd.Series(file['username']),
         'Course': pd.Series(file['course'])
@@ -216,7 +220,7 @@ def recommender_hybrid_by_user(user_name, n_recommendations):
 # In[13]:
 
 
-recommender_hybrid_by_user('THANAKORN DARASRISAK', 10)
+print(recommender_hybrid_by_user(user_input).to_html(index=False))
 
 
 # Training and Testing part
@@ -313,3 +317,5 @@ f1 = f1_score(y_test, predictions, average='weighted')
 
 print(f'Accuracy: {accuracy} \nPrecision: {precision}, \nRecall: {recall}, \nF1: {f1}')
 
+
+# %%

@@ -24,8 +24,8 @@ user_input = sys.argv[1]
 with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
-# file_name = './uploads/' + filename
-file_name = './uploads/' + 'Sample Dataset.xlsx'
+file_name = './uploads/' + filename
+# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 # Count the number of courses
@@ -384,7 +384,6 @@ def recommender_knn_by_user(username):
     return recommendations
 
 # In[27]:
-
 print(recommender_knn_by_user(user_input).to_html(index=False))
 
 # Predata of training
