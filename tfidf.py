@@ -128,7 +128,6 @@ with open(file_path, 'wb') as f:
 
 
 cosine_similarities = linear_kernel(tfidf_matrix)
-print(cosine_similarities)
 
 # Create recommendation system function
 
@@ -257,7 +256,7 @@ def recommender_tfidf_all_courses(course_name):
 
 def recommender_tfidf_by_user(user_name):
     
-    n_recommendations = 5
+    n_recommendations = number_of_courses - 1
     
     df = {
         'User': pd.Series(file['username']),

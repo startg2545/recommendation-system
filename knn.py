@@ -24,9 +24,9 @@ user_input = sys.argv[1]
 with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
-file_name = './uploads/' + filename
+# file_name = './uploads/' + filename
+file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
-
 
 # Count the number of courses
 
@@ -45,6 +45,7 @@ number_of_courses = len(course_counts)
 
 
 import os
+from datetime import datetime
 # Specify the folder path
 folder_path = '/workspaces/recommendation-system/pickle'
 
@@ -126,27 +127,32 @@ def getAgeEducationScore(age, limit_age):
 # In[10]:
 
 
-set_nan = {'อื่นๆ (-)', np.nan}
-set_primaryschool = {'ประถมศึกษา', 'อื่นๆ (ป.4)', 'อื่นๆ (ป.7)', 'อื่นๆ (ป7)'}
-set_middleschool = {'มัธยมศึกษาตอนต้น', 'Secondary school', 'อื่นๆ (มศ.3)'}
-set_highschool = {'มัธยมศึกษาตอนปลาย', 'High school', 'Vocational', 'การศึกษานอกระบบ', 
-                  'ประกาศนียบัตรวิชาชีพ (ปวช.)', 'อื่นๆ (ม.ปลาย จบหลักสูตรEMR เป็นจนท.ปฏิบัติการ)',
-                  'อื่นๆ (กำลังศึกษาชั้นมัธยมศึกษาตอนปลาย)', 'อื่นๆ (กำลังศึกษาชั้นมัธยมศึกษาปีที่6)', 
-                  'อื่นๆ (มศ.5)'}
-set_bachelor = {'ปริญญาตรี', 'Bachelor degree', 'Diploma', 'High Vocational', 
-                'ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)', 'อื่นๆ (กำลังศึกษาในระดับปริญญาตรี)', 
-                'อื่นๆ (กำลังศึกษาปริญญาตรี สาขารังสีเทคนิค)', 'อื่นๆ (ปริญญาแพทยศาสตร์บัณฑิต)', 
-                'อื่นๆ (นักศึกษาแพทย์ปี 5)', 'อื่นๆ (นักศึกษาแพทย์ มช ปี4 ศูนย์เชียงราย)', 
-                'อื่นๆ (แพทยศาสตร์บัณฑิต)', 'อื่นๆ (แพทย์)', 'อื่นๆ (ประกาศณียบัตรผู้ช่วยพยาบาล)', 
-                'อนุปริญญา', 'อื่นๆ (ป.ตรี)', 'อื่นๆ (ผู้ช่วยพยาบาล)'}
-set_masterdocter = {'ปริญญาโท', 'ปริญญาเอก', "Master's degree", 'Other (OBGYN specalist lavel 1)', 
-                    'Other (Residency)', 'Ph.D.', 'อื่นๆ (Internal Medicine)', 
-                    'อื่นๆ (เฉพาะทาง)', 'อื่นๆ (วุฒิบัตร)', 'อื่นๆ (วว.ออร์โธปิดิกส์)', 
-                    'อื่นๆ (วุฒิบัตรแสดงความรู้ความชำนาญในการประกอบวิชาชีพเภสัชกรรม สาขาเภสัชบำบัด)', 
-                    'อื่นๆ (วุฒิบัตรผู้เชี่ยวชาญสาขาทันตกรรมทั่วไป)', 'อื่นๆ (วุฒิบัตรศัลยศาสตร์และแม็กซิลโลเฟเชียล)'}
+# set_nan = {'อื่นๆ (-)', np.nan}
+# set_primaryschool = {'ประถมศึกษา', 'อื่นๆ (ป.4)', 'อื่นๆ (ป.7)', 'อื่นๆ (ป7)'}
+# set_middleschool = {'มัธยมศึกษาตอนต้น', 'Secondary school', 'อื่นๆ (มศ.3)'}
+# set_highschool = {'มัธยมศึกษาตอนปลาย', 'High school', 'Vocational', 'การศึกษานอกระบบ', 
+#                   'ประกาศนียบัตรวิชาชีพ (ปวช.)', 'อื่นๆ (ม.ปลาย จบหลักสูตรEMR เป็นจนท.ปฏิบัติการ)',
+#                   'อื่นๆ (กำลังศึกษาชั้นมัธยมศึกษาตอนปลาย)', 'อื่นๆ (กำลังศึกษาชั้นมัธยมศึกษาปีที่6)', 
+#                   'อื่นๆ (มศ.5)'}
+# set_bachelor = {'ปริญญาตรี', 'Bachelor degree', 'Diploma', 'High Vocational', 
+#                 'ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)', 'อื่นๆ (กำลังศึกษาในระดับปริญญาตรี)', 
+#                 'อื่นๆ (กำลังศึกษาปริญญาตรี สาขารังสีเทคนิค)', 'อื่นๆ (ปริญญาแพทยศาสตร์บัณฑิต)', 
+#                 'อื่นๆ (นักศึกษาแพทย์ปี 5)', 'อื่นๆ (นักศึกษาแพทย์ มช ปี4 ศูนย์เชียงราย)', 
+#                 'อื่นๆ (แพทยศาสตร์บัณฑิต)', 'อื่นๆ (แพทย์)', 'อื่นๆ (ประกาศณียบัตรผู้ช่วยพยาบาล)', 
+#                 'อนุปริญญา', 'อื่นๆ (ป.ตรี)', 'อื่นๆ (ผู้ช่วยพยาบาล)'}
+# set_masterdoctor = {'ปริญญาโท', 'ปริญญาเอก', "Master's degree", 'Other (OBGYN specalist lavel 1)', 
+#                     'Other (Residency)', 'Ph.D.', 'อื่นๆ (Internal Medicine)', 
+#                     'อื่นๆ (เฉพาะทาง)', 'อื่นๆ (วุฒิบัตร)', 'อื่นๆ (วว.ออร์โธปิดิกส์)', 
+#                     'อื่นๆ (วุฒิบัตรแสดงความรู้ความชำนาญในการประกอบวิชาชีพเภสัชกรรม สาขาเภสัชบำบัด)', 
+#                     'อื่นๆ (วุฒิบัตรผู้เชี่ยวชาญสาขาทันตกรรมทั่วไป)', 'อื่นๆ (วุฒิบัตรศัลยศาสตร์และแม็กซิลโลเฟเชียล)'}
 
-list_degree = ((set_nan, 0), (set_primaryschool, 16), (set_middleschool, 19), 
-               (set_highschool, 22), (set_bachelor,26), (set_masterdocter,40))
+set_middleschool = {'Middle school degree'}
+set_highschool = {'High school degree', 'Vocational degree'}
+set_bachelor = {'Bachelor degree', 'High vocational degree', 'Diploma degree'}
+set_masterdoctor = {'Master degree', 'Ph.D.'}
+
+list_degree = ((set_middleschool, 19), (set_highschool, 22), 
+               (set_bachelor,26), (set_masterdoctor,40))
 
 
 # Create Series of Age-Education
@@ -159,12 +165,15 @@ educations = file.loc[:, 'education']
 age_education_scores = []
 
 for i,x in enumerate(educations):
+    count = False
     for y in list_degree:
         if x in y[0]:
             age_education_scores.append(getAgeEducationScore(ages[i], y[1]))
-            
-age_education_scores = pd.Series(age_education_scores, name='Age Education Score')
+            count = True
+    if count == False:
+        print("User", i + 2, " with education", x, "is not in the list")
 
+age_education_scores = pd.Series(age_education_scores, name='Age Education Score')
 
 # Age-Education Score Statistic
 
@@ -197,11 +206,11 @@ status
 
 payment_score = []
 for x in status:
-    if x == 'ชำระเงิน':
+    if x == 'success':
         payment_score.append(2)
-    if x == 'ไม่ผ่านการอนุมัติ':
+    if x == 'disapproval':
         payment_score.append(1)
-    if x == 'ค้างชำระ':
+    if x == 'failure':
         payment_score.append(0)
 payment_score = pd.Series(payment_score)
 
@@ -255,23 +264,17 @@ one_score_count = address_score.where(address_score == 1).count()
 
 # In[19]:
 
-
 date = file.loc[:, 'date'].fillna("")
-date = pd.Series(date ,name='Date')
-colon_index = date.str.rfind(':')
-start_letter = (colon_index - 2).tolist()
-stop_letter = colon_index.tolist()
-hour = [s[start:stop] for s, start, stop in zip(date, start_letter, stop_letter)]
+hour = date.dt.hour
 
 # Provide a score to each user based on their enrollment time
 
 # In[20]:
 
 
-time_set = {'08','09','10','15'}  # if the time is in this set, it is considered as a good time
+time_set = {8,9,10,15}  # if the time is in this set, it is considered as a good time
 time_score = [ 1 if x in time_set else 0 for x in hour]
 time_score = pd.Series(time_score)
-
 
 # Create DataFrame by merging these 4 Series and calculate impressive level
 
@@ -291,7 +294,7 @@ d = {
     'Score': 1 + email_score*0.375 + age_education_scores*0.25 + time_score*0.5  + payment_score*1 + address_score*0.25
 }
 knn_features = pd.DataFrame(d)
-knn_features.head(20)
+knn_features
 
 
 # Create user-course table
@@ -380,6 +383,8 @@ def recommender_knn_by_user(username):
 
     return recommendations
 
+# In[27]:
+
 print(recommender_knn_by_user(user_input).to_html(index=False))
 
 # Predata of training
@@ -449,3 +454,5 @@ file_path = os.path.join(folder_path, 'knn_y.pickle')
 with open(file_path, 'wb') as f:
     pickle.dump(y, f)
 
+
+# %%
