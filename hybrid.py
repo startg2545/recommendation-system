@@ -270,8 +270,8 @@ predictions = regressor.predict(X_test)
 # In[18]:
 
 
-print("Mean Squared Error:", mean_squared_error(predictions,y_test) / 4)
-print("Mean Absolute Error:", mean_absolute_error(predictions,y_test) / 4)
+# print("Mean Squared Error:", mean_squared_error(predictions,y_test) / 4)
+# print("Mean Absolute Error:", mean_absolute_error(predictions,y_test) / 4)
 
 
 # Term Frequency and Inverse Document Frequency
@@ -315,7 +315,7 @@ precision = precision_score(y_test, predictions, average='weighted')
 recall = recall_score(y_test, predictions, average='weighted')
 f1 = f1_score(y_test, predictions, average='weighted')
 
-print(f'Accuracy: {accuracy} \nPrecision: {precision}, \nRecall: {recall}, \nF1: {f1}')
+# print(f'Accuracy: {accuracy} \nPrecision: {precision}, \nRecall: {recall}, \nF1: {f1}')
 
 
 # %%
