@@ -87,7 +87,7 @@ number_of_courses = len(courses)
 # In[7]:
 
 
-vectorizer = TfidfVectorizer(stop_words='english')
+vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(courses)
 
 # dense_tfidf_matrix = tfidf_matrix.toarray()
