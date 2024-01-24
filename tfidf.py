@@ -61,19 +61,19 @@ def clean_title(title):
 content = file['course'].drop_duplicates().fillna('')
 courses = content.sort_values().set_axis(range(0,len(content)))
 
-# Check if the course is in Thai language or not
-is_english_courses = courses.apply(is_english)
-thai_courses_not_trans = courses[is_english_courses == False]
+# # Check if the course is in Thai language or not
+# is_english_courses = courses.apply(is_english)
+# thai_courses_not_trans = courses[is_english_courses == False]
 
-# Translate courses in a thai language to en english language
-thai_courses = thai_courses_not_trans.apply(translate_eng)
-english_courses = courses[is_english_courses == True]
+# # Translate courses in a thai language to en english language
+# thai_courses = thai_courses_not_trans.apply(translate_eng)
+# english_courses = courses[is_english_courses == True]
 
-# Combine 2 series into a single series
-combined_courses = thai_courses._append(english_courses)
+# # Combine 2 series into a single series
+# combined_courses = thai_courses._append(english_courses)
 
-# Convert combined courses to be in form of regular expression
-courses_clean = combined_courses.apply(clean_title).sort_index()
+# # Convert combined courses to be in form of regular expression
+# courses_clean = combined_courses.apply(clean_title).sort_index()
 
 
 # In[6]:
@@ -88,7 +88,7 @@ number_of_courses = len(courses)
 
 
 vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(courses_clean)
+tfidf_matrix = vectorizer.fit_transform(courses)
 
 # dense_tfidf_matrix = tfidf_matrix.toarray()
 # print(dense_tfidf_matrix)
