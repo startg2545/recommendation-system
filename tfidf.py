@@ -291,7 +291,7 @@ def recommender_tfidf_by_user(user_name):
 
 # In[15]:
 
-# print(recommender_tfidf_by_user(user_input).to_html(index=False))
+print(recommender_tfidf_by_user(user_input).to_html(index=False))
 
 # References
 

@@ -18,4 +18,4 @@ selected_username = file[file['username'] == user_input]
 selected_courses = selected_username['course']
 
 # Print selected courses to html
-print(selected_courses.to_numpy())
+print(selected_courses.to_list())

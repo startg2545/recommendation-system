@@ -37,9 +37,9 @@ def get_recommendation():
 
     # Get courses that a selected user has taken
     user = request.form.get('user')
-    result = subprocess.run(['python', 'get_courses.py', user], capture_output=True, text=True)
-    # courses = np.fromstring(result.stdout, dtype=str)
-    courses = result.stdout
+    result = subprocess.run(['python', 'get_courses.py', user], capture_output=True, text=True).stdout
+    # Convert string to list
+    courses = eval(result)
 
     # Get recommendations
     if 'tfidf' in request.form:
