@@ -26,7 +26,6 @@ with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
 file_name = './uploads/' + filename
-# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 
@@ -63,7 +62,7 @@ with open(f'{folder_path}/tfidf_matrix.pickle', 'rb') as f:
 from sklearn.preprocessing import normalize
 from scipy.sparse import hstack
 
-# Set the weight
+# Set the weights
 tfidf_weight = 0.3
 knn_weight = 0.7
 
@@ -194,6 +193,7 @@ def recommender_hybrid_by_user(user_name):
     }
     
     user_course = pd.DataFrame(df)
+
     selected_user_name = user_course.loc[user_course['User'] == user_name]
     selected_courses = selected_user_name['Course']
     
@@ -218,7 +218,6 @@ def recommender_hybrid_by_user(user_name):
 # — But for user based, new user has to wait until next build of similarity matrix (which is the only computational part of the framework)
 
 # In[13]:
-
 
 print(recommender_hybrid_by_user(user_input).to_html(index=False))
 

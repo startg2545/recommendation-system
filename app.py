@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, redirect, session, url_for, render_template
 import pickle
 import subprocess
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'iqcejokmkbogg'  # replace with your secret key
@@ -33,6 +34,14 @@ def predata():
 
 @app.route('/get-recommendation', methods=['GET', 'POST'])
 def get_recommendation():
+
+    # Get courses that a selected user has taken
+    user = request.form.get('user')
+    result = subprocess.run(['python', 'get_courses.py', user], capture_output=True, text=True)
+    # courses = np.fromstring(result.stdout, dtype=str)
+    courses = result.stdout
+
+    # Get recommendations
     if 'tfidf' in request.form:
         model = 'tfidf'
         user = request.form.get('user')
@@ -48,7 +57,7 @@ def get_recommendation():
         user = request.form.get('user')
         result = subprocess.run(['python', 'hybrid.py', user], capture_output=True, text=True)
         dataframe = result.stdout
-    return render_template('recommendation.html', user=user, model=model, dataframe=dataframe)
+    return render_template('recommendation.html', user=user, model=model, dataframe=dataframe, courses=courses)
 
 if __name__ == '__main__':
     app.debug = True

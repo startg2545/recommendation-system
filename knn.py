@@ -25,7 +25,6 @@ with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
 file_name = './uploads/' + filename
-# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 # Count the number of courses
@@ -348,9 +347,9 @@ model_knn = NearestNeighbors(metric='cosine', algorithm='brute').fit(knn_matrix)
 
 
 def recommender_knn(course_name):
-    n_recommendations = int( number_of_courses ** (1/2) )
+    n_recommendations = int( number_of_courses ** (1/2) ) + 1
     idx = process.extractOne(course_name, courses)[2]
-    distances, indices = model_knn.kneighbors(knn_matrix[idx], n_neighbors=n_recommendations+1, return_distance=True)
+    distances, indices = model_knn.kneighbors(knn_matrix[idx], n_neighbors=n_recommendations, return_distance=True)
     recommendations = [courses[i].where(i!=idx) for i in indices]
     recommended_courses = recommendations[0][1:]
     course_distances = distances[0][1:]

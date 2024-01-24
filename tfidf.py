@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Import required packages
-
 # In[1]:
 
 
@@ -27,7 +25,6 @@ with open('./pickle/filename.pickle', 'rb') as f:
     filename = pickle.load(f)
 
 file_name = './uploads/' + filename
-# file_name = './uploads/' + 'Sample Dataset.xlsx'
 file = pd.read_excel(file_name)
 
 
@@ -278,13 +275,23 @@ def recommender_tfidf_by_user(user_name):
 
     for x in recommended_courses:
         df = df._append(x)
+
+    # Sort courses an drop duplicated courses
     df =  df.sort_values('Score', ascending=False).drop_duplicates('Course')
+
+    # Drop courses that user already has
+    for course in selected_courses:
+        df = df[df['Course'] != course]
+
+    # Drop courses that the score value is zero
+    df = df[df['Score'] != 0]
+
     return df.head(n_recommendations)
 
 
 # In[15]:
 
-print(recommender_tfidf_by_user(user_input).to_html(index=False))
+# print(recommender_tfidf_by_user(user_input).to_html(index=False))
 
 # References
 
