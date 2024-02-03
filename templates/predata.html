@@ -5,24 +5,24 @@
 </head>
 <body>
 
-<h2>Get recommendations</h2>
+<h2>Pick an approach to and type a desired username</h2>
 <p>Filename: {{ filename }}</p>
 
 <form method="POST" enctype="multipart/form-data" action="/get-recommendation">
     <h3>TF-IDF recommender</h3>
-    <p>Search a user:<input type="text" id="user" name="user"></p>
-    <input type="submit" name="tfidf" value="submit form tfidf">
+    <p style="display: inline-block;">Search a user:<input type="text" id="user" name="user"></p>
+    <input style="display: inline-block;" type="submit" name="tfidf" value="submit">
 </form>
 
 <form method="POST" enctype="multipart/form-data" action="/get-recommendation">
     <h3>KNN recommender</h3>
-    <p>Search a user:<input type="text" id="user" name="user"></p>
-    <input type="submit" name="knn" value="submit form knn">
+    <p style="display: inline-block;">Search a user:<input type="text" id="user" name="user"></p>
+    <input style="display: inline-block;" type="submit" name="knn" value="submit">
 </form>
 <form method="POST" enctype="multipart/form-data" action="/get-recommendation">
     <h3>Hybrid recommender</h3>
-    <p>Search a user:<input type="text" id="user" name="user"></p>
-    <input type="submit" name="hybrid" value="submit form hybrid">
+    <p style="display: inline-block;">Search a user:<input type="text" id="user" name="user"></p>
+    <input style="display: inline-block;" type="submit" name="hybrid" value="submit">
 </form>
 
 <script>
