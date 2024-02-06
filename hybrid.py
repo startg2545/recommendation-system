@@ -12,6 +12,7 @@ from fuzzywuzzy import process
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
 import sys
+import numpy as np
 
 
 # Check the validation of dataset format
@@ -21,12 +22,12 @@ import sys
 # Receive the user name from app.py
 user_input = sys.argv[1]
 
-# Get filename from pickle
-with open('./pickle/filename.pickle', 'rb') as f:
-    filename = pickle.load(f)
+# Get ui_dataset from pickle
+with open('./pickle/ui_dataset.pickle', 'rb') as f:
+    ui_dataset = pickle.load(f)
 
-file_name = './uploads/' + filename
-file = pd.read_excel(file_name)
+ui_dataset_file_name = './uploads/' + ui_dataset
+my_user_item = pd.read_excel(ui_dataset_file_name)
 
 
 # Count the number of courses
@@ -34,7 +35,7 @@ file = pd.read_excel(file_name)
 # In[3]:
 
 
-course_counts = pd.DataFrame(file)['course'].value_counts()
+course_counts = pd.DataFrame(my_user_item)['course'].value_counts()
 courses = pd.Series(course_counts.index)
 courses = courses.sort_values().set_axis(range(0,len(courses)))
 number_of_courses = len(course_counts)
@@ -67,12 +68,11 @@ tfidf_weight = 0.3
 knn_weight = 0.7
 
 # Normalize the matrices
-tfidf_matrix_normalized = normalize(tfidf_matrix)
-knn_matrix_normalized = normalize(knn_matrix)
+tfidf_matrix_normalized = normalize(tfidf_matrix) * tfidf_weight
+knn_matrix_normalized = normalize(knn_matrix) * knn_weight
 
 # Combined the normalized metrices
-combined_matrix = hstack([tfidf_matrix_normalized, knn_matrix_normalized])
-
+combined_matrix = hstack((tfidf_matrix_normalized, knn_matrix_normalized))
 
 # Euclidean Distance & Cosine Similarity
 
@@ -185,20 +185,24 @@ def recommender_hybrid_all_courses(course_name):
 
 def recommender_hybrid_by_user(user_name):
 
-    n_recommendations = number_of_courses - 1
+    n_recommendations = 10
 
     df = {
-        'User': pd.Series(file['username']),
-        'Course': pd.Series(file['course'])
+        'User': pd.Series(my_user_item['username']),
+        'Course': pd.Series(my_user_item['course'])
     }
     
     user_course = pd.DataFrame(df)
 
     selected_user_name = user_course.loc[user_course['User'] == user_name]
+
     selected_courses = selected_user_name['Course']
     
     recommended_courses = [ recommender_hybrid_all_courses(x) for x in selected_courses]
     
+    # Remove the rows with the selected courses
+    recommended_courses = [x[~x['Course'].isin(selected_courses)] for x in recommended_courses]
+
     # pre dataframe
     df = pd.DataFrame({
         'Course': [],
@@ -220,7 +224,6 @@ def recommender_hybrid_by_user(user_name):
 # In[13]:
 
 print(recommender_hybrid_by_user(user_input).to_html(index=False))
-
 
 # Training and Testing part
 

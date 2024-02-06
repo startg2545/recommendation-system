@@ -3,6 +3,8 @@
 
 # In[1]:
 
+# In[1]:
+
 
 import pandas as pd
 import re
@@ -18,17 +20,38 @@ import sys
 # In[2]:
 
 # Receive the user name from app.py
+
+# In[2]:
+
+
 user_input = sys.argv[1]
 
+
 # Get ui_dataset and i_dataset from pickle
+
+# In[3]:
+
+
 with open('./pickle/ui_dataset.pickle', 'rb') as f:
     ui_dataset = pickle.load(f)
+
+
+# In[4]:
+
 
 ui_dataset_file_name = './uploads/' + ui_dataset
 my_user_item = pd.read_excel(ui_dataset_file_name)
 
+
+# In[5]:
+
+
 with open('./pickle/i_dataset.pickle', 'rb') as f:
     i_dataset = pickle.load(f)
+
+
+# In[6]:
+
 
 i_dataset_file_name = './uploads/' + i_dataset
 my_item = pd.read_excel(i_dataset_file_name)
@@ -38,20 +61,28 @@ my_item = pd.read_excel(i_dataset_file_name)
 
 # In[3]:
 
+# In[7]:
+
+
 def translate_eng(text):
     return ts.translate_text(text)
+
+
+# In[8]:
+
 
 def is_english(text):
     for char in text:
         if char.isalpha() and char.isascii():
             return True
-    return False
-            
+    return False            
 
 
 # Clean title with regular expresion
 
 # In[4]:
+
+# In[9]:
 
 
 def clean_title(title):
@@ -62,27 +93,44 @@ def clean_title(title):
 
 # In[5]:
 
-
 # Take the series of courses from dataset column
-content = my_item['course'].drop_duplicates().fillna('')
-courses = content.sort_values().set_axis(range(0,len(content)))
 
-# # Check if the course is in Thai language or not
-# is_english_courses = courses.apply(is_english)
+# In[59]:
+
+selected_courses = my_user_item['course'].drop_duplicates()
+content = my_item['course']
+content = content[content.isin(selected_courses)].drop_duplicates()
+courses = content.sort_values()
+course_indexes = courses.index
+courses = courses.set_axis(range(0,len(content)))
+
+
+# Take the description of all courses
+
+# In[83]:
+
+
+descriptions = my_item['description'].iloc[course_indexes]
+descriptions = descriptions.set_axis(range(0,len(descriptions)))
+
+
+# # Check if the course is in Thai language or not<br>
+# is_english_courses = courses.apply(is_english)<br>
 # thai_courses_not_trans = courses[is_english_courses == False]
 
-# # Translate courses in a thai language to en english language
-# thai_courses = thai_courses_not_trans.apply(translate_eng)
+# # Translate courses in a thai language to en english language<br>
+# thai_courses = thai_courses_not_trans.apply(translate_eng)<br>
 # english_courses = courses[is_english_courses == True]
 
-# # Combine 2 series into a single series
+# # Combine 2 series into a single series<br>
 # combined_courses = thai_courses._append(english_courses)
 
-# # Convert combined courses to be in form of regular expression
+# # Convert combined courses to be in form of regular expression<br>
 # courses_clean = combined_courses.apply(clean_title).sort_index()
 
-
 # In[6]:
+
+# In[84]:
 
 
 number_of_courses = len(courses)
@@ -92,26 +140,36 @@ number_of_courses = len(courses)
 
 # In[7]:
 
+# In[85]:
+
 
 vectorizer = TfidfVectorizer()
-tfidf_matrix = vectorizer.fit_transform(courses)
+tfidf_matrix = vectorizer.fit_transform(descriptions)
 
-# dense_tfidf_matrix = tfidf_matrix.toarray()
+
+# dense_tfidf_matrix = tfidf_matrix.toarray()<br>
 # print(dense_tfidf_matrix)
 
-# feature_names = vectorizer.get_feature_names_out()
+# feature_names = vectorizer.get_feature_names_out()<br>
 # print(feature_names)
 
 # Create path
 
 # In[8]:
 
+# In[86]:
+
 
 import os
 # Specify the folder path
 folder_path = '/workspaces/recommendation-system/pickle'
 
+
 # Create the folder if it doesn't exist
+
+# In[87]:
+
+
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
@@ -119,6 +177,8 @@ if not os.path.exists(folder_path):
 # Export variable
 
 # In[9]:
+
+# In[88]:
 
 
 file_path = os.path.join(folder_path, 'tfidf_matrix.pickle')
@@ -130,12 +190,17 @@ with open(file_path, 'wb') as f:
 
 # In[10]:
 
+# In[89]:
+
 
 cosine_similarities = linear_kernel(tfidf_matrix)
+
 
 # Create recommendation system function
 
 # In[11]:
+
+# In[90]:
 
 
 def recommender_tfidf(course_name):
@@ -193,10 +258,11 @@ def recommender_tfidf(course_name):
 
 # In[12]:
 
-
 # Predata for hybrid recommendation
 
 # In[13]:
+
+# In[92]:
 
 
 def recommender_tfidf_all_courses(course_name):
@@ -257,20 +323,20 @@ def recommender_tfidf_all_courses(course_name):
 
 # In[14]:
 
+# In[93]:
+
 
 def recommender_tfidf_by_user(user_name):
     
-    n_recommendations = number_of_courses - 1
+    n_recommendations = 10
     
     df = {
         'User': pd.Series(my_user_item['username']),
         'Course': pd.Series(my_user_item['course'])
     }
-
     user_course = pd.DataFrame(df)
     selected_user_name = user_course.loc[user_course['User'] == user_name]
     selected_courses = selected_user_name['Course']
-
     recommended_courses = [ recommender_tfidf_all_courses(x) for x in selected_courses]
 
     # pre dataframe
@@ -278,7 +344,6 @@ def recommender_tfidf_by_user(user_name):
         'Course': [],
         'Score': []
     }).rename_axis('Index')
-
     for x in recommended_courses:
         df = df._append(x)
 
@@ -291,17 +356,20 @@ def recommender_tfidf_by_user(user_name):
 
     # Drop courses that the score value is zero
     df = df[df['Score'] != 0]
-
     return df.head(n_recommendations)
 
 
 # In[15]:
 
+# In[94]:
+
+
 print(recommender_tfidf_by_user(user_input).to_html(index=False))
+
 
 # References
 
-# https://practicaldatascience.co.uk/data-science/how-to-create-content-recommendations-using-tf-idf
+# https://practicaldatascience.co.uk/data-science/how-to-create-content-recommendations-using-tf-idf<br>
 # https://lukkiddd.com/tf-idf-%E0%B8%84%E0%B8%B3%E0%B9%84%E0%B8%AB%E0%B8%99%E0%B8%AA%E0%B8%B3%E0%B8%84%E0%B8%B1%E0%B8%8D%E0%B8%99%E0%B8%B0-dd1e1568312e
 
 # Training Test Part
@@ -309,6 +377,8 @@ print(recommender_tfidf_by_user(user_input).to_html(index=False))
 # Define how much similarity is to be recommended
 
 # In[16]:
+
+# In[ ]:
 
 
 threshold_value = 0.5  # Assume the similarity is symmetric
@@ -318,10 +388,17 @@ threshold_value = 0.5  # Assume the similarity is symmetric
 
 # In[17]:
 
+# In[ ]:
+
 
 X = tfidf_matrix.toarray()
 
+
 # Create a DataFrame from courses and item_list
+
+# In[ ]:
+
+
 def get_mean(item):
     arr = recommender_tfidf(item)['Cosine Similarity Score']
     if arr.empty:
@@ -329,6 +406,10 @@ def get_mean(item):
     else:
         return arr.mean()
     
+
+
+# In[ ]:
+
 
 def get_label(item):
     mean = get_mean(item)
@@ -344,10 +425,16 @@ y = [ get_label(course) for course in courses ]
 
 # In[18]:
 
+# In[ ]:
+
 
 file_path = os.path.join(folder_path, 'tfidf_X.pickle')
 with open(file_path, 'wb') as f:
     pickle.dump(X, f)
+
+
+# In[ ]:
+
 
 file_path = os.path.join(folder_path, 'tfidf_y.pickle')
 with open(file_path, 'wb') as f:
@@ -356,5 +443,5 @@ with open(file_path, 'wb') as f:
 
 # Reference
 
-# https://www.datacamp.com/tutorial/naive-bayes-scikit-learn
+# https://www.datacamp.com/tutorial/naive-bayes-scikit-learn<br>
 # https://chat.openai.com/share/a3144868-3e0d-4584-b443-b6c49efb9117
