@@ -20,19 +20,25 @@ import sys
 # Receive the user name from app.py
 user_input = sys.argv[1]
 
-# Get filename from pickle
-with open('./pickle/filename.pickle', 'rb') as f:
-    filename = pickle.load(f)
+# Get ui_dataset and i_dataset from pickle
+with open('./pickle/ui_dataset.pickle', 'rb') as f:
+    ui_dataset = pickle.load(f)
 
-file_name = './uploads/' + filename
-file = pd.read_excel(file_name)
+ui_dataset_file_name = './uploads/' + ui_dataset
+my_user_item = pd.read_excel(ui_dataset_file_name)
+
+with open('./pickle/i_dataset.pickle', 'rb') as f:
+    i_dataset = pickle.load(f)
+
+i_dataset_file_name = './uploads/' + i_dataset
+my_item = pd.read_excel(i_dataset_file_name)
 
 # Count the number of courses
 
 # In[3]:
 
 
-course_counts = pd.DataFrame(file)['course'].value_counts()
+course_counts = pd.DataFrame(my_user_item)['course'].value_counts()
 courses = pd.Series(course_counts.index)
 courses = courses.sort_values().set_axis(range(0,len(courses)))
 number_of_courses = len(course_counts)
@@ -58,7 +64,7 @@ if not os.path.exists(folder_path):
 # In[5]:
 
 
-s_name = file.loc[:, 'username']
+s_name = my_user_item.loc[:, 'username']
 Users = pd.Series(s_name, name='User')
 Users
 
@@ -68,7 +74,7 @@ Users
 # In[6]:
 
 
-s_email = file.loc[:, 'email'].fillna("")
+s_email = my_user_item.loc[:, 'email'].fillna("")
 Emails = pd.Series(s_email ,name='Email')
 Emails
 
@@ -159,8 +165,8 @@ list_degree = ((set_middleschool, 19), (set_highschool, 22),
 # In[11]:
 
 
-ages = file.loc[:, 'age']
-educations = file.loc[:, 'education']
+ages = my_user_item.loc[:, 'age']
+educations = my_user_item.loc[:, 'education']
 age_education_scores = []
 
 for i,x in enumerate(educations):
@@ -193,7 +199,7 @@ two_score_count = age_education_scores.where(age_education_scores == 2).count()
 # In[13]:
 
 
-status = file.loc[:, 'payment'].fillna("")
+status = my_user_item.loc[:, 'payment'].fillna("")
 status = pd.Series(status ,name='Status')
 status
 
@@ -233,7 +239,7 @@ two_score_count = payment_score.where(payment_score == 2).count()
 # In[16]:
 
 
-address = file.loc[:, 'address'].fillna("")
+address = my_user_item.loc[:, 'address'].fillna("")
 address = pd.Series(address ,name='Status')
 address
 
@@ -263,7 +269,7 @@ one_score_count = address_score.where(address_score == 1).count()
 
 # In[19]:
 
-date = file.loc[:, 'date'].fillna("")
+date = my_user_item.loc[:, 'date'].fillna("")
 hour = date.dt.hour
 
 # Provide a score to each user based on their enrollment time
@@ -280,8 +286,8 @@ time_score = pd.Series(time_score)
 # In[21]:
 
 
-user = file.loc[:, 'username']
-course = file.loc[:, 'course']
+user = my_user_item.loc[:, 'username']
+course = my_user_item.loc[:, 'course']
 d = {
     'User': user,
     'Course': course,
@@ -366,7 +372,7 @@ def recommender_knn(course_name):
 
 def recommender_knn_by_user(username):
     # Filter the courses that the user has already taken
-    user_courses = file.loc[file['username'] == username]['course']
+    user_courses = my_user_item.loc[my_user_item['username'] == username]['course']
     
     # Get the recommendations based on these courses
     recommendations = [recommender_knn(course) for course in user_courses]

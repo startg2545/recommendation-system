@@ -20,12 +20,18 @@ import sys
 # Receive the user name from app.py
 user_input = sys.argv[1]
 
-# Get filename from pickle
-with open('./pickle/filename.pickle', 'rb') as f:
-    filename = pickle.load(f)
+# Get ui_dataset and i_dataset from pickle
+with open('./pickle/ui_dataset.pickle', 'rb') as f:
+    ui_dataset = pickle.load(f)
 
-file_name = './uploads/' + filename
-file = pd.read_excel(file_name)
+ui_dataset_file_name = './uploads/' + ui_dataset
+my_user_item = pd.read_excel(ui_dataset_file_name)
+
+with open('./pickle/i_dataset.pickle', 'rb') as f:
+    i_dataset = pickle.load(f)
+
+i_dataset_file_name = './uploads/' + i_dataset
+my_item = pd.read_excel(i_dataset_file_name)
 
 
 # Language convert function
@@ -58,7 +64,7 @@ def clean_title(title):
 
 
 # Take the series of courses from dataset column
-content = file['course'].drop_duplicates().fillna('')
+content = my_item['course'].drop_duplicates().fillna('')
 courses = content.sort_values().set_axis(range(0,len(content)))
 
 # # Check if the course is in Thai language or not
@@ -257,8 +263,8 @@ def recommender_tfidf_by_user(user_name):
     n_recommendations = number_of_courses - 1
     
     df = {
-        'User': pd.Series(file['username']),
-        'Course': pd.Series(file['course'])
+        'User': pd.Series(my_user_item['username']),
+        'Course': pd.Series(my_user_item['course'])
     }
 
     user_course = pd.DataFrame(df)

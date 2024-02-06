@@ -2,10 +2,15 @@
 <html>
 <body>
 <h1>Ken's Lifelong Education</h1>
-<p>Select a file to upload:</p>
 <form method="POST" enctype="multipart/form-data" action="/">
-    <input type="file" id="myFile" name="filename">
+    <div>
+        <p style="display:inline-block">Upload <b>a user-item</b> dataset:</p>
+        <input style="display:inline-block" type="file" id="my-user-item" name="my-user-item">
+    </div>
+    <div>
+        <p style="display:inline-block">Upload <b>an item</b> dataset</p>
+        <input style="display:inline-block" type="file" id="my-item" name="my-item">
+    </div>
     <input type="submit">
 </form>
-</body>
 </html>
