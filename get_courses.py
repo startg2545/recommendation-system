@@ -7,7 +7,7 @@ import pickle
 user_input = sys.argv[1]
 
 # Get filename from pickle
-with open('./pickle/filename.pickle', 'rb') as f:
+with open('./pickle/ui_dataset.pickle', 'rb') as f:
     filename = pickle.load(f)
 
 file_name = './uploads/' + filename
