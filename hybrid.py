@@ -12,7 +12,7 @@ from fuzzywuzzy import process
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pickle
 import sys
-import numpy as np
+from pathlib import Path
 
 
 # Check the validation of dataset format
@@ -25,6 +25,8 @@ user_input = sys.argv[1]
 # Get ui_dataset from pickle
 with open('./pickle/ui_dataset.pickle', 'rb') as f:
     ui_dataset = pickle.load(f)
+
+BASE_DIR = Path(__file__).resolve(strict=True).parent
 
 ui_dataset_file_name = './uploads/' + ui_dataset
 my_user_item = pd.read_excel(ui_dataset_file_name)
@@ -83,6 +85,10 @@ model_combined = NearestNeighbors(metric='cosine', algorithm='brute').fit(combin
 '''This will create a new matrix where each row is the concatenation of the 
 corresponding rows from tfidf_matrix and knn_matrix. The NearestNeighbors model
 is then fit on this combined matrix.'''
+
+# Export model_combined to pickle file
+with open('./pickle/model_combined.pickle', 'wb') as f:
+    pickle.dump(model_combined, f)
 
 
 # Recommender function using hybrid model
