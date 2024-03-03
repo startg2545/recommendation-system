@@ -28,7 +28,7 @@ def predata():
     i_dataset = session.get('my-item')  # get my-item from session
 
     # Save filename to pickle
-    folder_path = '/workspaces/recommendation-system/pickle'
+    folder_path = './pickle'
     ui_dataset_path = os.path.join(folder_path, 'ui_dataset.pickle')
     i_dataset_path = os.path.join(folder_path, 'i_dataset.pickle')
     with open(ui_dataset_path, 'wb') as f:
