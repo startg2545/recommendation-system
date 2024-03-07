@@ -334,6 +334,7 @@ def recommender_tfidf_by_user(user_name):
         'User': pd.Series(my_user_item['username']),
         'Course': pd.Series(my_user_item['course'])
     }
+    
     user_course = pd.DataFrame(df)
     selected_user_name = user_course.loc[user_course['User'] == user_name]
     selected_courses = selected_user_name['Course']
