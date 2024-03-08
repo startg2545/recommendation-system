@@ -66,7 +66,6 @@ number_of_courses = len(course_counts)
 
 
 import os
-from datetime import datetime
 # Specify the folder path
 folder_path = '/workspaces/recommendation-system/pickle'
 
