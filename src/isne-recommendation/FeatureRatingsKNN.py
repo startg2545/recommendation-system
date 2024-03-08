@@ -94,8 +94,8 @@ def get_recommendations(username, ui_data, top_n):
         'Course': course,
         'Score': score
     })
-    data = pd.pivot_table(predata, values='Score', index='Course', columns='User').fillna(0)
-    matrix = csr_matrix(data.values)
+    user_course_tbl = pd.pivot_table(predata, values='Score', index='Course', columns='User').fillna(0)
+    matrix = csr_matrix(user_course_tbl.values)
     model = NearestNeighbors(metric='cosine', algorithm='brute').fit(matrix)
 
     def get_recommendations_for_course(course):
