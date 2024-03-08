@@ -25,7 +25,7 @@ from datetime import datetime
 # In[2]:
 
 
-user_input = sys.argv[1]
+user_input = 'Martha Long'
 
 
 # Get ui_dataset from pickle
@@ -452,7 +452,7 @@ def recommender_knn(course_name):
     n_recommendations = int( number_of_courses ** (1/2) ) + 1
     idx = process.extractOne(course_name, courses)[2]
     distances, indices = model_knn.kneighbors(knn_matrix[idx], n_neighbors=n_recommendations, return_distance=True)
-    
+    return courses
     recommendations = [courses[i].where(i!=idx) for i in indices]
     recommended_courses = recommendations[0][1:]
     course_distances = distances[0][1:]
@@ -474,6 +474,7 @@ def recommender_knn_by_user(username):
     # Filter the courses that the user has already taken
     user_courses = my_user_item.loc[my_user_item['username'] == username]['course']
 
+    return recommender_knn(user_courses[0])
     # Get the recommendations based on these courses
     recommendations = [recommender_knn(course) for course in user_courses]
 
@@ -492,8 +493,8 @@ def recommender_knn_by_user(username):
 
 # In[67]:
 
-
-print(recommender_knn_by_user(user_input).to_html(index=False))
+print(recommender_knn_by_user('Martha Long'))
+# print(recommender_knn_by_user(user_input).to_html(index=False))
 
 # Predata of training
 

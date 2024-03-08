@@ -9,6 +9,7 @@ def get_recommendations(username, ui_data, top_n):
 
     # Take the necessary data from the user-item dataframe
     courses = ui_data['course'].drop_duplicates()
+    courses = courses.sort_values().set_axis(range(0,len(courses)))
     user = pd.Series(ui_data['username'])
     course = pd.Series(ui_data['course'])
 
@@ -113,7 +114,6 @@ def get_recommendations(username, ui_data, top_n):
 
     # Filter the courses that the user has already taken
     user_courses = ui_data.loc[ui_data['username'] == username]['course']
-    return get_recommendations_for_course(user_courses[0])
     # Get the recommendations based on taken courses
     recommendations = [ get_recommendations_for_course(course) for course in user_courses ]
 
