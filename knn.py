@@ -452,6 +452,7 @@ def recommender_knn(course_name):
     n_recommendations = int( number_of_courses ** (1/2) ) + 1
     idx = process.extractOne(course_name, courses)[2]
     distances, indices = model_knn.kneighbors(knn_matrix[idx], n_neighbors=n_recommendations, return_distance=True)
+    
     recommendations = [courses[i].where(i!=idx) for i in indices]
     recommended_courses = recommendations[0][1:]
     course_distances = distances[0][1:]
@@ -472,7 +473,7 @@ def recommender_knn(course_name):
 def recommender_knn_by_user(username):
     # Filter the courses that the user has already taken
     user_courses = my_user_item.loc[my_user_item['username'] == username]['course']
-    
+
     # Get the recommendations based on these courses
     recommendations = [recommender_knn(course) for course in user_courses]
 
