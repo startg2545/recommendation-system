@@ -23,9 +23,7 @@ For detailed instructions on how to install the Study Focus Recommendation Syste
 After the successful installation, you can now import the get_recommendations function from these directories:
 
 ```
-from TfidfLinearKernel import get_recommendations
-from FeatureRatingsKNN import get_recommendations
-from Hybrid import get_recommendations
+from isne_recommendation import TfidfLinearKernel, FeatureRatingsKNN, Hybrid
 ```
 
 Are you seeking to unravel the mysteries behind recommendation systems? Look no further! Dive into the comprehensive guide available at [Usage](https://isne-recommendation.gitbook.io/recommendation-system/).

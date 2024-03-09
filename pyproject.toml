@@ -1,6 +1,6 @@
 [project]
 name = "isne-recommendation"
-version = "0.0.1"
+version = "0.0.3"
 authors = [
   { name="Newin Yamaguchi", email="newin_yamaguchi@cmu.ac.th" },
 ]

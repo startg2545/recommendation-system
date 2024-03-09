@@ -1,2 +1,1 @@
-import isne_recommendation 
-
+from isne_recommendation import TfidfLinearKernel, FeatureRatingsKNN, Hybrid
