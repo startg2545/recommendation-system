@@ -1,26 +1,41 @@
-﻿# recommendation-system
-## Prepare for a dataset
-- คอลัมน์ **ชื่อวิชา** ให้เปลี่ยนเป็น **course**
-- คอลัมน์ **ชื่อนามสกุล** ให้เปลี่ยนเป็น **username**
-- คอลัมน์ **อีเมล** ให้เปลี่ยนเป็น **email**
-- คอลัมน์ **วุฒิการศึกษา** ให้เปลี่ยนเป็น **education**
-- คอลัมน์ **อายุ** ให้เปลี่ยนเป็น **age**
-- คอลัมน์ **เวลาที่ชำระเงิน** ให้เปลี่ยนเป็น **time**
-- คอลัมน์ **สถานะการชำระเงิน** ให้เปลี่ยนเป็น **payment**
-- คอลัมน์ **ที่อยู่** ให้เปลี่ยนเป็น **address**
-## TF-IDF & Cosine Similarities
-หาความคล้ายคลึ่งกันระหว่าง**คอร์ส**เรียนในคอลัมน์ **course**
-## KNN
-หาระดับความ**ชอบ**ของผู้เรียนแต่ละคนโดยพิจารณาจาก**ประวัติการเรียน** ได้แก่
-- คอลัมน์ **email**: หากไม่กรอกอีเมล ให้ 0 คะแนน หากเป็นโดเมนอื่น ให้ 1 คะแนน หากโดเมนเป็น cmu ให้ 2 คะแนน
-- คอลัมน์ **age**-**education**: ระยะห่างระหว่างอายุกับวุฒิการศึกษา
-  - หากไม่เกิน 4 ปี (คาดว่ายังอยู่ในระบบการศึกษา) ให้ 0 คะแนน
-  - หากอยู่ระหว่าง 4 ถึง 6 ปี (คาดว่าเพิ่งจบการศึกษา) ให้ 1 คะแนน
-  - หากเกิน 6 ปี (คาดว่าไม่ได้อยู่ในระบบการศึกษา) ให้ 2 คะแนน
-- คอลัมน์ **time**: หากไม่ได้ลงทะเบียนในเวลาที่เหมาะสม ให้ 0 คะแนน หากได้ลงทะเบียนในเวลาที่เหมาะสม ให้ 1 คะแนน (เวลาที่เหมาะสม 09:00 - 11:00 และ 15:00 - 16:00)
-- คอลัมน์ **payment**: หากค้างชำระ ให้ 0 คะแนน หากไม่ผ่านการอนุมัติ ให้ 1 คะแนน หากชำระเงิน ให้ 2 คะแนน
-- คอลัมน์ **address**: ไม่กรอกข้อมูลที่อยู่ ให้ 0 คะแนน หากกรอกข้อมูลที่อยู่ ให้ 1 คะแนน
+# Recommendation System
+
+Our recommendation system will offer you the products or services that users are interested in and consume. Rationale is that users of Lifelong Education Website Chiang Mai University tend to choose the same course frequently since they aren't well advertised. Learners can be both students and people of all ages. Theory is to create an algorithm to allow users to access programs that meet their needs. We will use Python to create a backend system that can deploy with websites such as Netflix, Agoda, Amazon, etc.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Installation
+
+To install and set up the project, you can use the following command:
+```
+pip install isne-recommendation
+```
+
+For detailed instructions on how to install the Study Focus Recommendation System, please navigate to our installation guide on [Installation](https://isne-recommendation.gitbook.io/recommendation-system/installation). Follow the step-by-step instructions to set up the system on your machine and start enhancing your study experience today.
+
+## Usage
+
+After the successful installation, you can now import the get_recommendations function from these directories:
 
 ```
-score=1+(email*0.375)+(age-education*0.25)+(time*0.5)+(payment*1)+(address*0.25)  # โดยที่ 1<=score<=5
+from TfidfLinearKernel import get_recommendations
+from FeatureRatingsKNN import get_recommendations
+from Hybrid import get_recommendations
 ```
+
+Are you seeking to unravel the mysteries behind recommendation systems? Look no further! Dive into the comprehensive guide available at [Usage](https://isne-recommendation.gitbook.io/recommendation-system/).
+
+## Contributing
+
+Check out our [contribution guidelines](https://isne-recommendation.gitbook.io/recommendation-system/contributing) to learn how you can get involved. Whether it's coding, documentation, testing, or providing feedback, every contribution makes a difference and helps us create a better tool for students worldwide.
+
+## License
+
+**License:** MIT
+
+Please refer to the [LICENSE](LICENSE) file for more details.
