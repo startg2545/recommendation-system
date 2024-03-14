@@ -100,7 +100,7 @@ def get_recommendations(username, ui_data, top_n):
 
     def get_recommendations_for_course(course):
         idx = process.extractOne(course, courses)[2]
-        distances, indices = model.kneighbors(matrix[idx], n_neighbors=top_n, return_distance=True)
+        distances, indices = model.kneighbors(matrix[idx], n_neighbors=top_n+1, return_distance=True)
         recommendations = [courses[i].where(i!=idx) for i in indices]
         recommended_courses = recommendations[0][1:]
         course_distances = distances[0][1:]
