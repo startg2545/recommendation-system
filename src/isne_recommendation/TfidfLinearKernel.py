@@ -1,6 +1,10 @@
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import linear_kernel
 import pandas as pd
+import numpy as np
 
 def get_recommendations(username, i_data, ui_data, top_n):
 
@@ -21,6 +25,32 @@ def get_recommendations(username, i_data, ui_data, top_n):
         cosine_similarities = linear_kernel(matrix)
         return cosine_similarities
 
+    def get_all_recommended_courses(selected_courses):
+        courses = get_courses()
+
+        # Get all indices for the target dataframe column and drop any duplicates
+        indices = courses[courses.isin(selected_courses)].index
+
+        # Get the cosine similarity scores of all courses
+        cosine_similarities = fit_transform()
+        
+        # Use boolean indexing to select rows corresponding to selected courses
+        mask = np.isin(range(len(courses)), indices)
+        sim_scores = cosine_similarities[mask, :]
+        
+        # Get the top similar courses for each selected course
+        recommended_courses = []
+        for idx, course in enumerate(selected_courses):
+            target_index = courses[courses == course].index[0]
+            
+            scores = sim_scores[idx]
+            recommendations = pd.DataFrame({
+                'Course': courses,
+                'Score': scores
+            })
+            recommended_courses.append(recommendations)
+
+        return recommended_courses
     
     user_course = pd.DataFrame({
         'User': pd.Series(ui_data['username']),
@@ -29,54 +59,9 @@ def get_recommendations(username, i_data, ui_data, top_n):
 
     selected_user_name = user_course.loc[user_course['User'] == username]
     selected_courses = selected_user_name['Course']
-
-    def get_all_recommended_courses(course):
-        # Return indices for the target dataframe column and drop any duplicates
-        courses = get_courses()
-        indices = pd.Series(courses).drop_duplicates()
-        
-        # Get the index of the course
-        count = 0
-        for i in indices:
-            if i == course:
-                break
-            else:
-                count += 1
-        target_index = count
-
-        # Get the cosine similarity scores of the course
-        cosine_similarities = fit_transform()
-        sim_scores = list(enumerate(cosine_similarities[target_index]))
-
-        # Sort the courses based on the similarity scores
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-        
-        # Get the tuple of the closest scores excluding the target item and index
-        sim_scores = sim_scores[1:len(courses)]
-
-        # Extract the tuple course_names
-        index = (x[0] for x in sim_scores)
-        scores = (x[1] for x in sim_scores)
-
-        # Extract the tuple course_names
-        course_indices = [i[0] for i in sim_scores]
-
-        # Get the recommendations
-        recommendations = courses.iloc[course_indices]
-
-        # Remain specific columns
-        recommendations = pd.DataFrame(tuple(zip(index, recommendations, scores)),
-                                       columns=['Index', 'Course', 'Score'])
-        
-        # Take index from column 'index'
-        idx = recommendations['Index']
-
-        # Set and sort index
-        recommendations = recommendations.set_index(idx).drop(columns=['Index']).sort_index()
-
-        return recommendations
     
-    recommended_courses = [ get_all_recommended_courses(x) for x in selected_courses ]
+    recommended_courses = get_all_recommended_courses(selected_courses)
+    return recommended_courses
 
     # Prepare the final recommendations
     final_df = pd.DataFrame({
@@ -98,3 +83,27 @@ def get_recommendations(username, i_data, ui_data, top_n):
     final_df = final_df[final_df['Score'] > 0]
     
     return final_df.head(top_n)
+
+def get_evaluations(df):
+    # Separate features (X) and target variable (y)
+    X = df.drop(columns=['course'])
+    y = df['course']
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Preprocess the text data in X_train and X_test using TfidfVectorizer
+    vectorizer = TfidfVectorizer()
+    X_train_transformed = vectorizer.fit_transform(X_train['description'])
+    X_test_transformed = vectorizer.transform(X_test['description'])
+
+    # Initialize and train a classifier (e.g., Logistic Regression)
+    classifier = LogisticRegression()
+    classifier.fit(X_train_transformed, y_train)
+
+    # Make predictions on the testing data
+    y_pred = classifier.predict(X_test_transformed)
+
+    # Evaluate the accuracy of the model
+    accuracy = accuracy_score(y_test, y_pred)
+    return accuracy
