@@ -61,7 +61,6 @@ def get_recommendations(username, i_data, ui_data, top_n):
     selected_courses = selected_user_name['Course']
     
     recommended_courses = get_all_recommended_courses(selected_courses)
-    return recommended_courses
 
     # Prepare the final recommendations
     final_df = pd.DataFrame({
