@@ -9,18 +9,17 @@ import numpy as np
 def get_recommendations(username, i_data, ui_data, top_n):
 
     def get_courses():
-        selected_courses = ui_data['course'].drop_duplicates()
-        content = i_data['course']
-        content = content[content.isin(selected_courses)].drop_duplicates()
-        courses = content.sort_values()
-        courses = courses.set_axis(range(0, len(courses)))
+        courses = i_data['course']
+        courses = courses.sort_values()
+        courses = courses.set_axis(range(len(courses)))
         return courses
 
     def fit_transform():
-        courses = get_courses()
+        courses = i_data['course']
+        courses = courses.sort_values()
         indexes = courses.index
         description = i_data['description'].iloc[indexes]
-        description = description.set_axis(range(0, len(description)))
+        description = description.set_axis(range(len(description)))
         matrix = TfidfVectorizer().fit_transform(description)
         cosine_similarities = linear_kernel(matrix)
         return cosine_similarities
@@ -41,8 +40,6 @@ def get_recommendations(username, i_data, ui_data, top_n):
         # Get the top similar courses for each selected course
         recommended_courses = []
         for idx, course in enumerate(selected_courses):
-            target_index = courses[courses == course].index[0]
-            
             scores = sim_scores[idx]
             recommendations = pd.DataFrame({
                 'Course': courses,
@@ -82,27 +79,3 @@ def get_recommendations(username, i_data, ui_data, top_n):
     final_df = final_df[final_df['Score'] > 0]
     
     return final_df.head(top_n)
-
-def get_evaluations(df):
-    # Separate features (X) and target variable (y)
-    X = df.drop(columns=['course'])
-    y = df['course']
-
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Preprocess the text data in X_train and X_test using TfidfVectorizer
-    vectorizer = TfidfVectorizer()
-    X_train_transformed = vectorizer.fit_transform(X_train['description'])
-    X_test_transformed = vectorizer.transform(X_test['description'])
-
-    # Initialize and train a classifier (e.g., Logistic Regression)
-    classifier = LogisticRegression()
-    classifier.fit(X_train_transformed, y_train)
-
-    # Make predictions on the testing data
-    y_pred = classifier.predict(X_test_transformed)
-
-    # Evaluate the accuracy of the model
-    accuracy = accuracy_score(y_test, y_pred)
-    return accuracy

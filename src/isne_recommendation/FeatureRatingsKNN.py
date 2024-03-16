@@ -116,6 +116,9 @@ def get_recommendations(username, ui_data, top_n):
     user_courses = ui_data.loc[ui_data['username'] == username]['course']
     # Get the recommendations based on taken courses
     recommendations = [ get_recommendations_for_course(course) for course in user_courses ]
+    
+    if len(recommendations) == 0:
+        return 'No recommendations available for this user.'
 
     # Reset index
     recommendations = pd.concat(recommendations).drop_duplicates(subset='Course', keep='first')
