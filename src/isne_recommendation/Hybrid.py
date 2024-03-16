@@ -115,7 +115,7 @@ def get_recommendations(username, i_data, ui_data, top_n):
     tfidf_matrix = getTFIDFMatrix()
     knn_matrix = getKNNMatrix()
 
-    tfidf_matrix_normalized = normalize(tfidf_matrix) * tfidf_weight
+    tfidf_matrix_normalized = tfidf_matrix * tfidf_weight
     knn_matrix_normalized = normalize(knn_matrix) * knn_weight
 
     combined_matrix = hstack((tfidf_matrix_normalized, knn_matrix_normalized))
