@@ -35,6 +35,7 @@ def get_recommendations(username, i_data, ui_data, top_n):
         
         # Use boolean indexing to select rows corresponding to selected courses
         mask = np.isin(range(len(courses)), indices)
+
         sim_scores = cosine_similarities[mask, :]
         
         # Get the top similar courses for each selected course
@@ -58,6 +59,9 @@ def get_recommendations(username, i_data, ui_data, top_n):
     selected_courses = selected_user_name['Course']
     
     recommended_courses = get_all_recommended_courses(selected_courses)
+
+    if len(recommended_courses) == 0:
+        return 'No recommendations available for this user.'
 
     # Prepare the final recommendations
     final_df = pd.DataFrame({
