@@ -1,3 +1,3 @@
-from .TfidfLinearKernel import get_recommendations
-from .FeatureRatingsKNN import get_recommendations
-from .Hybrid import get_recommendations
+from .TfidfLinearKernel import fit, predict, train_test_split, evaluate_model
+from .FeatureRatingsKNN import fit, predict, train_test_split, evaluate_model
+from .Hybrid import fit, predict, train_test_split, evaluate_model
