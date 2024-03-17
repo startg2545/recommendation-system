@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 def _get_feature_matrix(ui_data):
+    ui_data = ui_data.set_axis(range(len(ui_data)))
     user = pd.Series(ui_data['username'])
     course = pd.Series(ui_data['course'])
 
@@ -22,17 +23,18 @@ def _get_feature_matrix(ui_data):
             else:
                 email_score.append(0)
         return pd.Series(email_score)
+    def getScore(age, limit_age):
+        if age <= limit_age:
+            score = 0
+        elif age <= limit_age + 2:
+            score = 1
+        else:
+            score = 2
+        return score
+
     def getAgeEducationScore():
         ages = pd.Series(ui_data['age'])
         educations = pd.Series(ui_data['education'])
-        def getAgeEducationScore(age, limit_age):
-            if age <= limit_age:
-                score = 0
-            elif age <= limit_age + 2:
-                score = 1
-            else:
-                score = 2
-            return score
         set_nan = {np.nan}
         set_primary = {'Primary school level'}
         set_middleschool = {'Middle school level'}
@@ -42,13 +44,9 @@ def _get_feature_matrix(ui_data):
         list_degree = ((set_nan, 0)), (set_primary, 15), (set_middleschool, 19), (set_highschool, 22), (set_bachelor,26), (set_masterdoctor,40)
         age_education_scores = []
         for i,x in enumerate(educations):
-            count = False
             for y in list_degree:
                 if x in y[0]:
-                    age_education_scores.append(getAgeEducationScore(ages[i], y[1]))
-                    count = True
-            if count == False:
-                print("User", i+2, " with education ", x, " is not in the list")
+                    age_education_scores.append(getScore(ages[i], y[1]))
         return pd.Series(age_education_scores)
     def getPaymentScore():
         statuses = pd.Series(ui_data['payment'])
@@ -60,7 +58,7 @@ def _get_feature_matrix(ui_data):
                 payment_score.append(1)
             if data == 'failure':
                 payment_score.append(0)
-        return payment_score
+        return pd.Series(payment_score)
     def getAddressScore():
         addresses = pd.Series(ui_data['address'])
         address_score = []
@@ -144,32 +142,41 @@ def predict(username, ui_data, model, top_n):
     return recommendations
 
 def train_test_split(ui_data):
-    # Drop courses that have been taken more than 1 time by the same user
-    ui_data_drop = ui_data.drop_duplicates(subset=['username', 'course'])
+    # Drop the rows that the same course has been taken by the same user
+    drop_dup = ui_data.drop_duplicates(subset=['username', 'course'])
+
+    # Drop the rows that users have taken only one course
+    multiple_data = drop_dup[drop_dup['username'].map(drop_dup['username'].value_counts()) > 1]
 
     # Calculate the number of courses each user has taken
-    courses_per_user = ui_data_drop.groupby('username')['course'].count().reset_index()
+    courses_per_user = multiple_data.groupby('username')['course'].count().reset_index()
     courses_per_user.columns = ['username', 'course_count']
 
     # Merge the courses_per_user DataFrame back to the original DataFrame
-    merged_user_courses = ui_data_drop.merge(courses_per_user, on='username')
+    merged_user_courses = multiple_data.merge(courses_per_user, on='username')
 
     # Sort the DataFrame by username and course to ensure consistent train-test split
     user_courses = merged_user_courses.sort_values(by=['username', 'course'])
 
     # Initialize a counter variable to keep track of the number of courses for each user
-    course_counter = 1
+    course_counter = 0
+    current_user = None
 
     # Create a list to store the split information (True for training, False for testing)
     split_list = []
 
     # Iterate through each row to determine the split
     for index, row in user_courses.iterrows():
-        if course_counter < row['course_count']:
+        if row['username'] != current_user:
+            # We're at a new user, so reset the counter
+            course_counter = 0
+            current_user = row['username']
+
+        if course_counter < row['course_count'] - 1:
             split_list.append(True)  # Training data
         else:
             split_list.append(False)  # Testing data
-            course_counter = 1  # Reset the counter for the next user
+
         course_counter += 1
 
     # Add the split information to the DataFrame
@@ -182,9 +189,6 @@ def train_test_split(ui_data):
     # Drop the auxiliary columns used for splitting
     train_ui_data = train_ui_data.drop(['course_count', 'split'], axis=1)
     test_ui_data = test_ui_data.drop(['course_count', 'split'], axis=1)
-
-    train_ui_data = train_ui_data.set_axis(range(len(train_ui_data)))
-    test_ui_data = test_ui_data.set_axis(range(len(test_ui_data)))
 
     return train_ui_data, test_ui_data
 

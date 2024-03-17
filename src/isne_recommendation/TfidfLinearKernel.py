@@ -3,7 +3,7 @@ from sklearn.metrics.pairwise import linear_kernel
 import pandas as pd
 import numpy as np
 
-def fit_transform(i_data):
+def fit(i_data):
     courses = i_data['course']
     courses = courses.sort_values()
     indexes = courses.index
@@ -55,7 +55,7 @@ def predict(username, i_data, ui_data, model, top_n):
     selected_courses = selected_user_name['Course']
     
     recommended_courses = get_all_recommended_courses(selected_courses)
-
+    
     if len(recommended_courses) == 0:
         return 'No recommendations available for this user.'
 
@@ -80,37 +80,42 @@ def predict(username, i_data, ui_data, model, top_n):
     
     return final_df.head(top_n)
 
-def evaluate_model(i_data, ui_data, model):
-    # The names of users who have taken more than one course
-    usernames = ui_data['username'].value_counts()
-    usernames = usernames[usernames > 1].index
+def train_test_split(ui_data):
+    # Drop the rows that the same course has been taken by the same user
+    drop_dup = ui_data.drop_duplicates(subset=['username', 'course'])
 
-    # Drop courses that have been taken more than 1 time by the same user
-    ui_data_drop = ui_data.drop_duplicates(subset=['username', 'course'])
+    # Drop the rows that users have taken only one course
+    multiple_data = drop_dup[drop_dup['username'].map(drop_dup['username'].value_counts()) > 1]
 
     # Calculate the number of courses each user has taken
-    courses_per_user = ui_data_drop.groupby('username')['course'].count().reset_index()
+    courses_per_user = multiple_data.groupby('username')['course'].count().reset_index()
     courses_per_user.columns = ['username', 'course_count']
 
     # Merge the courses_per_user DataFrame back to the original DataFrame
-    merged_user_courses = ui_data_drop.merge(courses_per_user, on='username')
+    merged_user_courses = multiple_data.merge(courses_per_user, on='username')
 
     # Sort the DataFrame by username and course to ensure consistent train-test split
     user_courses = merged_user_courses.sort_values(by=['username', 'course'])
 
     # Initialize a counter variable to keep track of the number of courses for each user
-    course_counter = 1
+    course_counter = 0
+    current_user = None
 
     # Create a list to store the split information (True for training, False for testing)
     split_list = []
 
     # Iterate through each row to determine the split
     for index, row in user_courses.iterrows():
-        if course_counter < row['course_count']:
+        if row['username'] != current_user:
+            # We're at a new user, so reset the counter
+            course_counter = 0
+            current_user = row['username']
+
+        if course_counter < row['course_count'] - 1:
             split_list.append(True)  # Training data
         else:
             split_list.append(False)  # Testing data
-            course_counter = 1  # Reset the counter for the next user
+
         course_counter += 1
 
     # Add the split information to the DataFrame
@@ -124,18 +129,22 @@ def evaluate_model(i_data, ui_data, model):
     train_ui_data = train_ui_data.drop(['course_count', 'split'], axis=1)
     test_ui_data = test_ui_data.drop(['course_count', 'split'], axis=1)
 
-    train_ui_data = train_ui_data.set_axis(range(len(train_ui_data)))
-    test_ui_data = test_ui_data.set_axis(range(len(test_ui_data)))
+    return train_ui_data, test_ui_data
+
+def evaluate_model(train, test, i_data, model):
+    # The names of users who have taken more than one course
+    usernames = train['username'].value_counts()
+    usernames = usernames[usernames > 1].index
 
     hit = []
     for name in usernames:
-        predictions = predict(name, i_data, train_ui_data, model, 10)
+        predictions = predict(name, i_data, train, model, 10)
         if type(predictions) is str:
             isHit = False
             hit.append(isHit)
         else:
             predictions = predictions['Course'].tolist()
-            results = test_ui_data[test_ui_data['username'] == name]['course'].iloc[0]
+            results = test[test['username'] == name]['course'].iloc[0]
             isHit = results in predictions
             hit.append(isHit)
 
