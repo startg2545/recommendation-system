@@ -193,14 +193,14 @@ def train_test_split(ui_data):
     return train_ui_data, test_ui_data
 
 
-def evaluate_model(train, test, model, top_n):
+def evaluate_model(train, test, model):
     # The names of users who have taken more than one course
     usernames = train['username'].value_counts()
     usernames = usernames[usernames > 1].index
 
     hit = []
     for name in usernames:
-        predictions = predict(name, train, model, top_n)
+        predictions = predict(name, train, model, 10)
         if type(predictions) is str:
             isHit = False
             hit.append(isHit)
