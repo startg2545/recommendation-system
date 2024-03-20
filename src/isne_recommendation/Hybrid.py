@@ -219,19 +219,62 @@ def train_test_split(ui_data, test_size):
 
     return train_ui_data, test_ui_data
 
-def evaluate_model(train, test, i_data, model):
+def hit_rate(train, test, i_data, model, k=10):
     # The names of users who have taken more than one course
     usernames = train['username'].value_counts()
     usernames = usernames[usernames > 1].index
 
-    hit = []
+    hits = []
     for name in usernames:
-        predictions = predict(name, i_data, train, model, 10)['Course'].tolist()
-        results = test[test['username'] == name]['course'].iloc[0]
-        isHit = results in predictions
-        hit.append(isHit)
+        predictions = predict(name, i_data, train, model, k)['Course'].tolist()
+        results = test[test['username'] == name]['course']
+        test_predictions = [ result in predictions for result in results]
+        isHit = [ True if pred == True else False for pred in test_predictions][0]
+        hits.append(isHit)
 
-    hits = np.count_nonzero(hit)
+    hits = np.count_nonzero(hits)
     accuracy = hits / len(usernames)
     
+    return accuracy
+
+def f1_score(train, test, i_data, model, k=10):
+    # The names of users who have taken more than one course
+    usernames = train['username'].value_counts()
+    usernames = usernames[usernames > 1].index
+
+    hits_of_users = []
+    for name in usernames:
+        predictions = predict(name, i_data, train, model, k)['Course'].tolist()
+        results = test[test['username'] == name]['course']
+        test_predictions = [ result in predictions for result in results]
+        isHit = [ True if pred == True else False for pred in test_predictions]
+        hits_of_users.append(isHit)
+
+    f1_list = []
+
+    for hits in hits_of_users:
+        
+        # Calculate the parameters
+        total_n_relevant_items = len(hits)
+        n_relevant_items = np.count_nonzero(hits)
+        
+        # Recall @K
+        recall = np.array([n_relevant_items / total_n_relevant_items])
+
+        # Precision @K
+        precision = np.array([n_relevant_items / k])
+
+        # F1 Score
+        if recall and precision == 0:
+            f1 = 0
+        else:
+            dividend = 2 * precision * recall
+            divisor = precision + recall
+            with np.errstate(divide='ignore', invalid='ignore'):
+                f1 = np.where(divisor != 0, np.divide( dividend, divisor ), 0)[0]
+        
+        f1_list.append(f1)
+    
+    accuracy = np.mean(f1_list)
+        
     return accuracy
