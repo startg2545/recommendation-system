@@ -36,4 +36,4 @@ Check out our [contribution guidelines](https://isne-recommendation.gitbook.io/r
 
 **License:** MIT
 
-Please refer to the [LICENSE](LICENSE) file for more details.
+Please refer to the [LICENSE](https://docs.isne-recommendation.com/license) file for more details.
