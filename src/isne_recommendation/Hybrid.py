@@ -168,7 +168,7 @@ def predict(username, i_data, ui_data, model, top_n):
     
     return recommender_hybrid_by_user(username)
 
-def train_test_split(ui_data):
+def train_test_split(ui_data, test_size):
     # Drop the rows that the same course has been taken by the same user
     drop_dup = ui_data.drop_duplicates(subset=['username', 'course'])
 
@@ -199,7 +199,7 @@ def train_test_split(ui_data):
             course_counter = 0
             current_user = row['username']
 
-        if course_counter < row['course_count'] - 1:
+        if course_counter < ( ( 1 - test_size ) * row['course_count'] - 1 ):
             split_list.append(True)  # Training data
         else:
             split_list.append(False)  # Testing data
