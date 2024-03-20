@@ -1,6 +1,6 @@
 # Recommendation System
 
-This system offers you the products or services that users are interested to consume. The rationale is that users of Lifelong Education Website Chiang Mai University tend to choose the same course frequently since they aren't well recommended.
+The recommendation system aims to suggest the best suitable courses for learners who have taken at least one course.
 
 ## Table of Contents
 
@@ -12,7 +12,8 @@ This system offers you the products or services that users are interested to con
 ## Installation
 
 To install and set up the project, you can use the following command:
-```
+
+```[PowerShell]
 pip install isne-recommendation
 ```
 
@@ -22,7 +23,7 @@ For detailed instructions on how to install the Study Focus Recommendation Syste
 
 After installation is successful, you can now import these functions from an isne_recommendation package:
 
-```
+```[PowerShell]
 from isne_recommendation import TfidfLinearKernel, FeatureRatingsKNN, Hybrid
 ```
 
