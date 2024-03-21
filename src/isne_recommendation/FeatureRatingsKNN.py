@@ -207,11 +207,11 @@ def hit_rate(train, test, model, k=10):
             predictions = predictions['Course'].tolist()
             results = test[test['username'] == name]['course']
             test_predictions = [ result in predictions for result in results]
-            isHit = [ True if pred == True else False for pred in test_predictions][0]
-            hits.append(isHit)
+            isHit = [True if pred == True else False for pred in test_predictions]
+            if True in isHit:
+                hits.append(True)
 
-    hits = np.count_nonzero(hits)
-    accuracy = hits / len(usernames)
+    accuracy = len(hits) / len(usernames)
     
     return accuracy
 
