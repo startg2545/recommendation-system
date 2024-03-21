@@ -132,9 +132,8 @@ def train_test_split(ui_data, test_size):
     return train_ui_data, test_ui_data
 
 def hit_rate(train, test, i_data, model, k=10):
-    # The names of users who have taken more than one course
-    usernames = train['username'].value_counts()
-    usernames = usernames[usernames > 1].index
+    
+    usernames = train['username'].drop_duplicates()
 
     hits = []
     for name in usernames:

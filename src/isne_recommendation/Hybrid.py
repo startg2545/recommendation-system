@@ -238,9 +238,8 @@ def hit_rate(train, test, i_data, model, k=10):
     return accuracy
 
 def f1_score(train, test, i_data, model, k=10):
-    # The names of users who have taken more than one course
-    usernames = train['username'].value_counts()
-    usernames = usernames[usernames > 1].index
+
+    usernames = train['username'].drop_duplicates()
 
     hits_of_users = []
     for name in usernames:
