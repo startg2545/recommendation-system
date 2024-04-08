@@ -110,8 +110,8 @@ def train_test_split(ui_data, test_size):
             # We're at a new user, so reset the counter
             course_counter = 0
             current_user = row['username']
-
-        if course_counter < ( ( 1 - test_size ) * row['course_count'] - 1 ):
+        ceil_value = np.floor( ( 1 - test_size ) * row['course_count'] - 1 )
+        if course_counter <= ceil_value:
             split_list.append(True)  # Training data
         else:
             split_list.append(False)  # Testing data
